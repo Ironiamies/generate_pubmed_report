@@ -44,7 +44,7 @@ def fetch_pubmed_abstracts():
         "db": "pubmed",
         "term": search_query,
         "retmode": "json",
-        "reldate": 3, 
+        "reldate": 14, 
         "retmax": 15 # Haetaan max 15 kiinnostavinta osumaa kerralla
     }
     
