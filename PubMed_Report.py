@@ -42,13 +42,13 @@ def fetch_pubmed_abstracts():
         'AND (human[Filter])'
     )
     
-    # 1. Etsitään julkaisujen ID:t (PMID) viimeisen 3 päivän ajalta (reldate=3)
+    # 1. Etsitään julkaisujen ID:t (PMID) viimeisen 30 päivän ajalta (reldate=3)
     search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     search_params = {
         "db": "pubmed",
         "term": search_query,
         "retmode": "json",
-        "reldate": 14, 
+        "reldate": 30, 
         "retmax": 15 # Haetaan max 15 kiinnostavinta osumaa kerralla
     }
     
