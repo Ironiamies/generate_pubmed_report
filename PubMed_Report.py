@@ -44,7 +44,7 @@ def fetch_pubmed_abstracts():
     
     # 1. Etsitään julkaisujen ID:t (PMID) viimeisen 60 päivän ajalta (reldate=3)
     search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
-   search_params = {
+    search_params = {
         "db": "pubmed",
         "term": search_query,
         "retmode": "json",
