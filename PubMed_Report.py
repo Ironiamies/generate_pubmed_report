@@ -44,12 +44,13 @@ def fetch_pubmed_abstracts():
     
     # 1. Etsitään julkaisujen ID:t (PMID) viimeisen 60 päivän ajalta (reldate=3)
     search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
-    search_params = {
+   search_params = {
         "db": "pubmed",
         "term": search_query,
         "retmode": "json",
-        "reldate": 60, 
-        "retmax": 15 # Haetaan max 15 kiinnostavinta osumaa kerralla
+        "reldate": 60,
+        "retmax": 30, # Nostettu, jotta Gemini saa enemmän raakadataa
+        "sort": "date" # TÄRKEÄ: Varmistaa, että saat uusimmat ensin!
     }
     
     res = get_robust_request(search_url, params=search_params)
@@ -81,14 +82,22 @@ def fetch_pubmed_abstracts():
     try:
         root = ET.fromstring(f_res.content)
         for article in root.findall('.//PubmedArticle'):
-            pmid = article.find('.//PMID').text
-            title = article.find('.//ArticleTitle').text
+            pmid_el = article.find('.//PMID')
+            title_el = article.find('.//ArticleTitle')
+            
+            # Varmistetaan, ettei tyhjiä elementtejä yritetä lukea
+            if pmid_el is None or title_el is None:
+                continue
+                
+            pmid = pmid_el.text
+            # Turvallinen luku tagien läpi
+            title = "".join(title_el.itertext()).strip()
             
             abstract_text = ""
             abstract_elements = article.findall('.//AbstractText')
             for el in abstract_elements:
                 if el.text:
-                    abstract_text += el.text + " "
+                    abstract_text += "".join(el.itertext()) + " "
             
             if abstract_text.strip():
                 abstracts_data.append({
