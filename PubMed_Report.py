@@ -13,7 +13,7 @@ warnings.filterwarnings('ignore')
 
 # Ympäristömuuttujat
 GEMINI_KEY = os.getenv('GEMINI_API_KEY')
-TG_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN') # Tai BIOHACKER_BOT_TOKEN
+TG_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TG_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 def get_robust_request(url, params=None):
@@ -42,15 +42,15 @@ def fetch_pubmed_abstracts():
         'AND (human[Filter])'
     )
     
-    # 1. Etsitään julkaisujen ID:t (PMID) viimeisen 60 päivän ajalta (reldate=3)
+    # 1. Etsitään julkaisujen ID:t (PMID) viimeisen 60 päivän ajalta
     search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     search_params = {
         "db": "pubmed",
         "term": search_query,
         "retmode": "json",
         "reldate": 60,
-        "retmax": 30, # Nostettu, jotta Gemini saa enemmän raakadataa
-        "sort": "date" # TÄRKEÄ: Varmistaa, että saat uusimmat ensin!
+        "retmax": 30,
+        "sort": "date"
     }
     
     res = get_robust_request(search_url, params=search_params)
@@ -62,7 +62,7 @@ def fetch_pubmed_abstracts():
     id_list = data.get("esearchresult", {}).get("idlist", [])
     
     if not id_list:
-        print("ℹ️ Ei uusia tutkimuksia tällä hakuehdolla viimeiseen 3 päivään.")
+        print("ℹ️ Ei uusia tutkimuksia tällä hakuehdolla viimeiseen 60 päivään.")
         return []
 
     # 2. Haetaan löydettyjen julkaisujen abstraktit (tiivistelmät)
@@ -85,12 +85,10 @@ def fetch_pubmed_abstracts():
             pmid_el = article.find('.//PMID')
             title_el = article.find('.//ArticleTitle')
             
-            # Varmistetaan, ettei tyhjiä elementtejä yritetä lukea
             if pmid_el is None or title_el is None:
                 continue
                 
             pmid = pmid_el.text
-            # Turvallinen luku tagien läpi
             title = "".join(title_el.itertext()).strip()
             
             abstract_text = ""
@@ -127,7 +125,7 @@ def generate_science_report():
     for s in studies:
         ai_input += f"ID: {s['pmid']}\nOTSIKKO: {s['title']}\nTIIVISTELMÄ: {s['abstract']}\n\n"
 
-   system_prompt = """
+    system_prompt = """
     Rooli: Huipputason liikuntatieteilijä, kardiologiaan ja metaboliaan perehtynyt kliininen fysiologi sekä urheiluravitsemuksen asiantuntija.
     TEHTÄVÄ: Saat listan tuoreista PubMed-tutkimuksista. Tehtäväsi on valita 1-3 kaikkein mielenkiintoisinta ja käytännönläheisintä löydöstä, jotka liittyvät voimaharjoitteluun, kestävyysurheiluun, uneen, palautumiseen tai avainlisäravinteisiin (kuten E-EPA, kuidut/psyllium, proteiinit ja kreatiini). Kirjoita niistä iskevä, suomenkielinen aamuraportti.
     
@@ -157,7 +155,6 @@ def generate_science_report():
     
     if response and response.text:
         msg_text = response.text
-        # Lähetetään Telegramiin pätkissä, jos menee yli rajan
         for i in range(0, len(msg_text), 4000):
             bot.send_message(TG_CHAT_ID, msg_text[i:i+4000])
             time.sleep(1)
