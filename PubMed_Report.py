@@ -30,7 +30,7 @@ def fetch_pubmed_abstracts():
     print("🔬 Haetaan tuoreita tutkimuksia PubMedistä...")
     
     # Hakutermit (Voima, Kestävyys, Palautuminen/Uni) ja filtteri ihmiskokeille
-   search_query = (
+    search_query = (
         '(("muscle hypertrophy"[Title/Abstract] OR "strength training"[Title/Abstract] OR '
         '"rate of force development"[Title/Abstract] OR "VO2 max"[Title/Abstract] OR '
         '"cycling economy"[Title/Abstract] OR "endurance performance"[Title/Abstract] OR '
