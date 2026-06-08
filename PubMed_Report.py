@@ -39,18 +39,18 @@ def fetch_pubmed_abstracts():
         '"psyllium"[Title/Abstract] OR "whey protein"[Title/Abstract] OR '
         '"protein supplementation"[Title/Abstract] OR "creatine monohydrate"[Title/Abstract] OR '
         '"beta-alanine"[Title/Abstract]") '
-        'AND ("humans"[MeSH Terms])'
+        'AND (human[Filter])'
     )
     
-    # 1. Etsitään julkaisujen ID:t (PMID) viimeisen 2 päivän ajalta
+    # 1. Etsitään julkaisujen ID:t (PMID) vain edellisen vuorokauden ajalta (reldate: 1)
     search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     search_params = {
         "db": "pubmed",
         "term": search_query,
         "retmode": "json",
-        "reldate": 3,
-        "retmax": 30,
-        "sort": "date"
+        "reldate": 1, # Haetaan vain aidosti uudet
+        "retmax": 20  # 20 riittää tekoälylle
+        # "sort": "date" -> Poistettu tahallaan, jotta saadaan lisäysjärjestyksessä!
     }
     
     res = get_robust_request(search_url, params=search_params)
@@ -62,7 +62,7 @@ def fetch_pubmed_abstracts():
     id_list = data.get("esearchresult", {}).get("idlist", [])
     
     if not id_list:
-        print("ℹ️ Ei uusia tutkimuksia tällä hakuehdolla viimeiseen 2 päivään.")
+        print("ℹ️ Ei uusia tutkimuksia tällä hakuehdolla viimeiseen vuorokauteen.")
         return []
 
     # 2. Haetaan löydettyjen julkaisujen abstraktit (tiivistelmät)
