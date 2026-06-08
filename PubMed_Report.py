@@ -42,13 +42,13 @@ def fetch_pubmed_abstracts():
         'AND ("humans"[MeSH Terms])'
     )
     
-    # 1. Etsitään julkaisujen ID:t (PMID) viimeisen 60 päivän ajalta
+    # 1. Etsitään julkaisujen ID:t (PMID) viimeisen 2 päivän ajalta
     search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     search_params = {
         "db": "pubmed",
         "term": search_query,
         "retmode": "json",
-        "reldate": 60,
+        "reldate": 3,
         "retmax": 30,
         "sort": "date"
     }
@@ -62,7 +62,7 @@ def fetch_pubmed_abstracts():
     id_list = data.get("esearchresult", {}).get("idlist", [])
     
     if not id_list:
-        print("ℹ️ Ei uusia tutkimuksia tällä hakuehdolla viimeiseen 60 päivään.")
+        print("ℹ️ Ei uusia tutkimuksia tällä hakuehdolla viimeiseen 2 päivään.")
         return []
 
     # 2. Haetaan löydettyjen julkaisujen abstraktit (tiivistelmät)
@@ -127,7 +127,7 @@ def generate_science_report():
 
     system_prompt = """
     Rooli: Huipputason liikuntatieteilijä, kardiologiaan ja metaboliaan perehtynyt kliininen fysiologi sekä urheiluravitsemuksen asiantuntija.
-    TEHTÄVÄ: Saat listan tuoreista PubMed-tutkimuksista. Tehtäväsi on valita 1-3 kaikkein mielenkiintoisinta ja käytännönläheisintä löydöstä, jotka liittyvät voimaharjoitteluun, kestävyysurheiluun, uneen, palautumiseen tai avainlisäravinteisiin (kuten E-EPA, kuidut/psyllium, proteiinit ja kreatiini). Kirjoita niistä iskevä, suomenkielinen aamuraportti.
+    TEHTÄVÄ: Saat listan tuoreista PubMed-tutkimuksista. Tehtäväsi on valita 1-4 kaikkein mielenkiintoisinta ja käytännönläheisintä löydöstä, jotka liittyvät voimaharjoitteluun, kestävyysurheiluun, uneen, palautumiseen tai avainlisäravinteisiin (kuten E-EPA, kuidut/psyllium, proteiinit ja kreatiini). Kirjoita niistä iskevä, suomenkielinen aamuraportti.
     
     SÄÄNNÖT:
     1. Aloita otsikolla: "🧬 **TIEDEKATSAUS [Tämän päivän päivämäärä]**"
